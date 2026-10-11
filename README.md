@@ -84,12 +84,22 @@ sequenceDiagram
 
 ### 2. Low-Rank OV Copying Eigenvalue Spectrum
 The full token-to-token map $W_E W_V W_O W_U$ is of size $50,257 \times 50,257$ (unfeasible to materialize). Because $\text{rank}(W_V W_O) \le d_{\text{head}} = 64$, we exploit the non-zero eigenvalue identity:
-$$\text{spec}_{\ne 0}(AB) = \text{spec}_{\ne 0}(BA)$$
+
+$$
+\text{spec}_{\ne 0}(AB) = \text{spec}_{\ne 0}(BA)
+$$
+
 Letting $A = W_E W_V \in \mathbb{R}^{d_{\text{vocab}} \times d_{\text{head}}}$ and $B = W_O W_U \in \mathbb{R}^{d_{\text{head}} \times d_{\text{vocab}}}$, we compute the spectrum of the $64 \times 64$ Gram matrix:
-$$M_{\text{small}} = B A = W_O W_U W_E W_V \in \mathbb{R}^{64 \times 64}$$
+
+$$
+M_{\text{small}} = B A = W_O W_U W_E W_V \in \mathbb{R}^{64 \times 64}
+$$
 
 The **Copying Score** (fraction of positive real eigenvalue mass) is:
-$$\text{Copying Score} = \frac{\sum_i \text{Re}(\lambda_i)}{\sum_i |\lambda_i|} = \frac{\text{Tr}(M_{\text{small}})}{\sum_i |\lambda_i|}$$
+
+$$
+\text{Copying Score} = \frac{\sum_i \text{Re}(\lambda_i)}{\sum_i |\lambda_i|} = \frac{\text{Tr}(M_{\text{small}})}{\sum_i |\lambda_i|}
+$$
 
 | Layer / Head | OV Copying Score | Description |
 | :--- | :---: | :--- |
@@ -105,7 +115,9 @@ $$\text{Copying Score} = \frac{\sum_i \text{Re}(\lambda_i)}{\sum_i |\lambda_i|} 
 ### 3. Direct Logit Attribution (DLA)
 Decomposing the final residual stream into additive per-head components projected onto the target unembedding direction $W_U[:, \text{target}]$:
 
-$$\text{DLA}(l, h) = \left(\text{LN}_{\text{scale}} \cdot \text{head}_{l,h}\right)^T W_U[:, \text{target}]$$
+$$
+\text{DLA}(l, h) = \left(\text{LN-scale} \cdot \text{head}_{l,h}\right)^T W_U[:, \text{target}]
+$$
 
 **Prompt**: `"The cat sat on the mat. The cat"` $\to$ **Target Token**: `" sat"` (Final model logit: `+16.6119`)
 
